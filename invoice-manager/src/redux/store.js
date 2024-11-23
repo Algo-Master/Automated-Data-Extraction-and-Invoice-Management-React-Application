@@ -1,13 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
-import invoicesSlice from './slices/invoicesSlice';
-import productsSlice from './slices/productsSlice';
-import customersSlice from './slices/customersSlice';
+import uploadedDataSlice from './slices/uploadedDataSlice';
 
 const store = configureStore({
   reducer: {
-    invoices: invoicesSlice,
-    products: productsSlice,
-    customers: customersSlice,
+    uploadedData: uploadedDataSlice,
   },
 });
 
