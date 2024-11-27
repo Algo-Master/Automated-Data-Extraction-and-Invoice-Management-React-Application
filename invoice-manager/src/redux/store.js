@@ -1,9 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit';
-import uploadedDataSlice from './slices/uploadedDataSlice';
+import dataReducer from './slices/dataSlice';
 
 const store = configureStore({
   reducer: {
-    uploadedData: uploadedDataSlice,
+    data: dataReducer, // This handles our centralized data
   },
 });
 

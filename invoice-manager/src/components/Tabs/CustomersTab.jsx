@@ -1,50 +1,50 @@
 import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-  } from "../ui/table";
-  
-  const CustomersTab = () => {
-    const customerData = [
-      {
-        name: "John Doe",
-        phone: "123-456-7890",
-        totalPurchase: "$1050.00",
-      },
-      {
-        name: "Jane Smith",
-        phone: "987-654-3210",
-        totalPurchase: "$530.00",
-      },
-    ];
-  
-    return (
-      <div className="flex justify-center p-4">
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../ui/table";
+import { useSelector } from "react-redux";
+
+const CustomersTab = () => {
+  // Fetch customer data from Redux store
+  const customerData = useSelector((state) =>
+    state.data.map((customer) => ({
+      name: customer.customerName,
+      phone: customer.phoneNumber,
+      totalPurchase: `$${customer.totalAmount.toFixed(2)}`,
+    }))
+  );
+
+  return (
+    <div className="p-4 flex flex-col items-center">
+      <h1 className="text-2xl font-bold mb-4">Customer Details</h1>
+      <div className="w-[90%] lg:w-[80%] overflow-x-auto">
         <Table className="w-full">
           <TableCaption>A list of your customers.</TableCaption>
           <TableHeader>
             <TableRow>
-              <TableHead>Customer Name</TableHead>
+              <TableHead className="w-[100px]">Customer Name</TableHead>
               <TableHead>Phone Number</TableHead>
-              <TableHead>Total Purchase Amount</TableHead>
+              <TableHead className="text-right">Total Purchase Amount</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {customerData.map((customer, index) => (
               <TableRow key={index}>
                 <TableCell className="font-medium">{customer.name}</TableCell>
-                <TableCell>{customer.phone}</TableCell>
-                <TableCell>{customer.totalPurchase}</TableCell>
+                <TableCell className="text-center">{customer.phone}</TableCell>
+                <TableCell className="text-right">{customer.totalPurchase}</TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </div>
-    );
-  };
-  
-  export default CustomersTab;  
+    </div>
+  );
+};
+
+export default CustomersTab;
