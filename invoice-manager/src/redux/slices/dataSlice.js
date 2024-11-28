@@ -23,13 +23,7 @@ const dataSlice = createSlice({
           (record) => record.email === newRecord.email
         );
 
-        if (existingIndex !== -1) {
-          // Update existing record
-          state[existingIndex] = { ...state[existingIndex], ...newRecord };
-        } else {
-          // Add new record
-          state.push(newRecord);
-        }
+        state.push(newRecord);
       });
     },
   },
