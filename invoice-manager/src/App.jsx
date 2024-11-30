@@ -11,7 +11,6 @@ const App = () => {
   return (
     <Router>
       <SidebarProvider>
-        <div className="flex h-screen">
           <AppSidebar />
           <main className="flex-1 overflow-auto p-4">
           <SidebarTrigger />
@@ -22,7 +21,6 @@ const App = () => {
               <Route path="/customers" element={<CustomersTab />} />
             </Routes>
           </main>
-        </div>
       </SidebarProvider>
     </Router>
   );
