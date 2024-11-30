@@ -1,6 +1,7 @@
 
 // Removed files for not junking up GitHub
 // Please make the sample datafiles in JSON format
+// Check out if there are any git merge issues
 
 .env
 node_modules
