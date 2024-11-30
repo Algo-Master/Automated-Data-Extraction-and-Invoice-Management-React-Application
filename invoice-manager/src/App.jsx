@@ -13,7 +13,7 @@ const App = () => {
       <SidebarProvider>
           <AppSidebar />
           <main className="flex-1 overflow-auto p-4">
-          <SidebarTrigger />
+            <SidebarTrigger />
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/invoices" element={<InvoicesTab />} />
