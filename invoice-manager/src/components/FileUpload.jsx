@@ -49,7 +49,7 @@ const FileUpload = () => {
 
   return (
     <div>
-      <input type="file" accept=".pdf,.jpg,.csv" onChange={handleFileUpload} />
+      <input type="file" accept=".pdf,.jpg,.xlsx" onChange={handleFileUpload} />
     </div>
   );
 };

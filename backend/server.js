@@ -1,8 +1,8 @@
 const express = require("express");
 const multer = require("multer");
-const axios = require("axios");
 const fs = require("fs");
 const path = require("path");
+const { processFile } = require("./FileProcessor");
 require("dotenv").config();
 
 const app = express();
@@ -43,19 +43,21 @@ app.post("/upload", upload.single("file"), async (req, res) => {
   try {
     const filePath = req.file.path;
     const mimeType = req.file.mimetype;
-    const displayName = req.file.originalname;
 
-    // Upload the file to Gemini API
-    const uploadResponse = await fileManager.uploadFile(filePath, {
-      mimeType,
-      displayName,
+    // Convert the file to a Gemini-supported format
+    const { convertedPath, convertedMimeType } = await processFile(filePath, mimeType);
+
+    // Upload the converted file to Gemini API
+    const uploadResponse = await fileManager.uploadFile(convertedPath, {
+      mimeType: convertedMimeType,
+      displayName: req.file.originalname,
     });
 
     console.log(
       `Uploaded file ${uploadResponse.file.displayName} as: ${uploadResponse.file.uri}`
     );
 
-    // Generate content (e.g., summary) using Gemini API
+    // Generate content using Gemini API
     const result = await model.generateContent([
       {
         fileData: {
@@ -80,14 +82,16 @@ app.post("/upload", upload.single("file"), async (req, res) => {
                 date: "2024-11-01",
             }
             Systematically go through the file and for each user generate this object and place it in the array
-            if any of the parameter like tax or quantity is not mentioned then u should keep its value as null.`,
+            if any of the parameter like tax or quantity is not mentioned then u should keep its value as null.
+            Remember dont send me any extra data or notes or anything else of that same sort. Just the json array data`,
       },
     ]);
 
-    // Clean up the local file after uploading
+    // Clean up local files after uploading
     fs.unlinkSync(filePath);
+    if (convertedPath !== filePath) fs.unlinkSync(convertedPath);
 
-    //For local Testing
+    // For local Testing
     console.log(result);
 
     // Send the response back to the client
