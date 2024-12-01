@@ -1,0 +1,13 @@
+0> No need for backend now, keep the Gemini API Key in env for vercel.
+1> Add navigation in between the Home and other tabs.                                               Done
+2> Integrate React DropZone for file Drag and Drop capability.                                      Done
+3> Redux integration for Store management of the JSON list of files.                                Done
+3.5> Backend included for safe and secure AI management and Error Handling                          Done
+4> Use Gemini API from Google Cloud console to Generate JSON data from the files provided.          Done
+
+5> UI Sidebar issue                                                                                 Fixed    Imp
+6> XLSX to CSV kit in backend                                                                       Done
+7> Use google Vision AI to process the image                                                        Todo
+8> Carry out updates in any tab reflect it in redux store using reducers                            Ongoing  Imp
+    o>  Table React Component change: AG grid Table substituted for ShadCN table
+        for editing features.

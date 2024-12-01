@@ -22,7 +22,7 @@ async function processFile(filePath, mimeType) {
       const csvPath = path.join(outputDir, `${baseName}.csv`);
       xlsx.writeFile(workbook, csvPath, { bookType: "csv" });
       return { convertedPath: csvPath, convertedMimeType: "text/csv" };
-    } else if (mimeType.startsWith("image/") || extension === ".jpg") {
+    } else if (extension === ".jpg") {
       // Convert .jpg to .pdf
       const pdfPath = path.join(outputDir, `${baseName}.pdf`);
       await sharp(filePath).toFile(pdfPath);
