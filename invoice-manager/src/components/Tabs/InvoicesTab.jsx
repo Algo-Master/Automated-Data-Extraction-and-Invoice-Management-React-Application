@@ -1,56 +1,78 @@
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "../ui/table";
-import { useSelector } from "react-redux";
+import { useMemo } from "react";
+import { AgGridReact } from "ag-grid-react"; // React Data Grid Component
+import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the Data Grid
+import "ag-grid-community/styles/ag-theme-quartz.css"; // Import Quartz theme
+import { useSelector, useDispatch } from "react-redux";
+import { updateRecord } from "../../redux/slices/dataSlice"; // Adjust the import path as needed
 
 const InvoicesTab = () => {
+  const dispatch = useDispatch();
+
   // Fetch invoice data from Redux store
   const invoiceData = useSelector((state) =>
     state.data.map((invoice) => ({
-      customer: invoice.customerName,
-      product: invoice.productName,
-      qty: invoice.quantity,
-      tax: `$${invoice.tax.toFixed(2)}`,
-      total: `$${invoice.totalAmount.toFixed(2)}`,
+      id: invoice.id,
+      customerName: invoice.customerName,
+      productName: invoice.productName,
+      quantity: invoice.quantity,
+      tax: parseFloat(invoice.tax).toFixed(2),
+      totalAmount: parseFloat(invoice.totalAmount).toFixed(2),
       date: invoice.date,
     }))
   );
 
+  // Column definitions
+  const colDefs = useMemo(
+    () => [
+      { field: "id", headerName: "ID", editable: false },
+      { field: "customerName", headerName: "Customer Name", editable: true },
+      { field: "productName", headerName: "Product Name", editable: true },
+      { field: "quantity", headerName: "Quantity", editable: true },
+      {
+        field: "tax",
+        headerName: "Tax",
+        editable: true,
+        valueFormatter: (params) => `$${parseFloat(params.value).toFixed(2)}`,
+      },
+      {
+        field: "totalAmount",
+        headerName: "Total Amount",
+        editable: true,
+        valueFormatter: (params) => `$${parseFloat(params.value).toFixed(2)}`,
+      },
+      { field: "date", headerName: "Date", editable: true },
+    ],
+    []
+  );
+
+  const defaultColDef = {
+    flex: 1,
+    sortable: true,
+    filter: true,
+  };
+
+  // Handle cell edits
+  const onCellValueChanged = (params) => {
+    const updatedField = { [params.colDef.field]: params.newValue };
+
+    // Update Redux store
+    dispatch(updateRecord({ id: params.data.id, updatedFields: updatedField }));
+  };
+
   return (
-    <div className="p-4 flex flex-col items-center">
+    <div className="p-4 flex flex-col items-center" 
+    style={{ width: "100%", height: "100%" }}>
       <h1 className="text-2xl font-bold mb-4">Invoice Details</h1>
-      <div className="w-[90%] lg:w-[80%] overflow-x-auto">
-        <Table className="w-full">
-          <TableCaption>A list of your recent invoices.</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Customer Name</TableHead>
-              <TableHead>Product Name</TableHead>
-              <TableHead>Qty</TableHead>
-              <TableHead>Tax</TableHead>
-              <TableHead>Total Amount</TableHead>
-              <TableHead>Date</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {invoiceData.map((invoice, index) => (
-              <TableRow key={index}>
-                <TableCell>{invoice.customer}</TableCell>
-                <TableCell>{invoice.product}</TableCell>
-                <TableCell className="text-center">{invoice.qty}</TableCell>
-                <TableCell className="text-right">{invoice.tax}</TableCell>
-                <TableCell className="text-right">{invoice.total}</TableCell>
-                <TableCell>{invoice.date}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+      <div
+        className="ag-theme-quartz-dark"
+        style={{ width: "100%", height: "75%" }}
+      >
+        <AgGridReact
+          rowData={invoiceData}
+          columnDefs={colDefs}
+          defaultColDef={defaultColDef}
+          onCellValueChanged={onCellValueChanged}
+        />
       </div>
     </div>
   );

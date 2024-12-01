@@ -50,16 +50,20 @@ const CustomersTab = () => {
   };
 
   return (
-    <div
-      className="ag-theme-quartz-dark"
-      style={{ width: "100%", height: "100%" }}
-    >
-      <AgGridReact
-        rowData={customerData} // Directly use data from the Redux store
-        columnDefs={colDefs}
-        defaultColDef={defaultColDef}
-        onCellValueChanged={onCellValueChanged} // Triggered on edit
-      />
+    <div className="p-4 flex flex-col items-center" 
+    style={{ width: "100%", height: "100%" }}>
+      <h1 className="text-2xl font-bold mb-4">Customers Details</h1>
+      <div
+        className="ag-theme-quartz-dark"
+        style={{ width: "100%", height: "75%" }}
+      >
+        <AgGridReact
+          rowData={customerData}
+          columnDefs={colDefs}
+          defaultColDef={defaultColDef}
+          onCellValueChanged={onCellValueChanged}
+        />
+      </div>
     </div>
   );
 };
