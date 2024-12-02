@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const xlsx = require("xlsx");
-const sharp = require("sharp");
+const PDFDocument = require("pdfkit");
 
 async function processFile(filePath, mimeType) {
   const extension = path.extname(filePath).toLowerCase();
@@ -22,10 +22,28 @@ async function processFile(filePath, mimeType) {
       const csvPath = path.join(outputDir, `${baseName}.csv`);
       xlsx.writeFile(workbook, csvPath, { bookType: "csv" });
       return { convertedPath: csvPath, convertedMimeType: "text/csv" };
-    } else if (extension === ".jpg") {
+    } else if (mimeType === "image/jpeg" || extension === ".jpg") {
       // Convert .jpg to .pdf
       const pdfPath = path.join(outputDir, `${baseName}.pdf`);
-      await sharp(filePath).toFile(pdfPath);
+      const doc = new PDFDocument();
+      const writeStream = fs.createWriteStream(pdfPath);
+      doc.pipe(writeStream);
+
+      // Embed the image
+      doc.image(filePath, {
+        fit: [1000, 1400], // Adjust this based on desired PDF layout
+        align: "center",
+        valign: "center",
+      });
+
+      doc.end();
+
+      // Wait for the PDF to finish writing
+      await new Promise((resolve, reject) => {
+        writeStream.on("finish", resolve);
+        writeStream.on("error", reject);
+      });
+
       return { convertedPath: pdfPath, convertedMimeType: "application/pdf" };
     } else if (mimeType === "application/pdf" || extension === ".pdf") {
       // No conversion needed for PDFs
