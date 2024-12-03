@@ -4,12 +4,14 @@ import axios from "axios";
 import { useDispatch } from "react-redux";
 import { setUploadedData } from "../redux/slices/dataSlice"; // Import the action
 
+const BackendUrl = import.meta.env.VITE_BACKEND_URL;
+
 const FileUpload = () => {
   const dispatch = useDispatch();
 
   const handleUpload = async (formData) => {
     try {
-      const response = await axios.post("http://localhost:8000/upload", formData, {
+      const response = await axios.post(`${BackendUrl}/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
