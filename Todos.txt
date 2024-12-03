@@ -14,3 +14,4 @@
     o>  Synchronizing Redux with AG Grid
 
 9> Deployments ongoing Clientside -- 1
+10> VISION AI integrated (I was just foolishly converting jpg to pdf).
