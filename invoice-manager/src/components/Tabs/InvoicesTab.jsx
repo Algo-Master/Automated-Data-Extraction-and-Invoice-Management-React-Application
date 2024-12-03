@@ -25,8 +25,8 @@ const InvoicesTab = () => {
   const colDefs = useMemo(
     () => [
       { field: "id", headerName: "ID", editable: false },
-      { field: "customerName", headerName: "Customer Name", editable: true },
-      { field: "productName", headerName: "Product Name", editable: true },
+      { field: "customerName", headerName: "Customer Name", editable: true, flex: 2 },
+      { field: "productName", headerName: "Product Name", editable: true, flex: 2 },
       { field: "quantity", headerName: "Quantity", editable: true },
       {
         field: "tax",
@@ -38,6 +38,7 @@ const InvoicesTab = () => {
         field: "totalAmount",
         headerName: "Total Amount",
         editable: true,
+        flex: 2,
         valueFormatter: (params) => `$${parseFloat(params.value).toFixed(2)}`,
       },
       { field: "date", headerName: "Date", editable: true },
