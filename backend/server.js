@@ -2,7 +2,10 @@ const express = require("express");
 const multer = require("multer");
 const fs = require("fs");
 const path = require("path");
-const { processFile } = require("./FileProcessor");
+
+const { processFile } = require("./Data Processing/FileProcessor");
+const { processResponses } = require("./Data Processing/ResponseProcessor");
+
 require("dotenv").config();
 
 const app = express();
@@ -38,35 +41,43 @@ const model = genAI.getGenerativeModel({
 // Set up multer for file uploads
 const upload = multer({ dest: "uploads/" });
 
-// Route to upload file and process with Gemini API
-app.post("/upload", upload.single("file"), async (req, res) => {
+// Route to upload multiple files and process with Gemini API
+app.post("/upload", upload.array("files"), async (req, res) => {
   try {
-    const filePath = req.file.path;
-    const mimeType = req.file.mimetype;
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: "No files uploaded" });
+    }
 
-    // Convert the file to a Gemini-supported format
-    const { convertedPath, convertedMimeType } = await processFile(filePath, mimeType);
+    const responses = [];
 
-    // Upload the converted file to Gemini API
-    const uploadResponse = await fileManager.uploadFile(convertedPath, {
-      mimeType: convertedMimeType,
-      displayName: req.file.originalname,
-    });
+    for (const file of req.files) {
+      const filePath = file.path;
+      const mimeType = file.mimetype;
 
-    console.log(
-      `Uploaded file ${uploadResponse.file.displayName} as: ${uploadResponse.file.uri}`
-    );
+      try {
+        // Convert the file to a Gemini-supported format
+        const { convertedPath, convertedMimeType } = await processFile(filePath, mimeType);
 
-    // Generate content using Gemini API
-    const result = await model.generateContent([
-      {
-        fileData: {
-          mimeType: uploadResponse.file.mimeType,
-          fileUri: uploadResponse.file.uri,
-        },
-      },
-      {
-        text: `I want you to get me a json array from this file which will contain json objects like this:
+        // Upload the converted file to Gemini API
+        const uploadResponse = await fileManager.uploadFile(convertedPath, {
+          mimeType: convertedMimeType,
+          displayName: file.originalname,
+        });
+
+        console.log(
+          `Uploaded file ${uploadResponse.file.displayName} as: ${uploadResponse.file.uri}`
+        );
+
+        // Generate content using Gemini API
+        const result = await model.generateContent([
+          {
+            fileData: {
+              mimeType: uploadResponse.file.mimeType,
+              fileUri: uploadResponse.file.uri,
+            },
+          },
+          {
+            text: `I want you to get me a json array from this file which will contain json objects like this:
             {
                 customerName: "Alice Johnson",
                 phoneNumber: "9876543210",
@@ -83,22 +94,32 @@ app.post("/upload", upload.single("file"), async (req, res) => {
             }
             Systematically go through the file and for each user generate this object and place it in the array
             if any of the parameter like tax or quantity is not mentioned then u should keep its value as null.
-            Remember dont send me any extra data or notes or anything else of that same sort. Just the json array data`,
-      },
-    ]);
+            Remember don't send me any extra data or notes or anything else of that same sort. Just the json array data`,
+          },
+        ]);
 
-    // Clean up local files after uploading
-    fs.unlinkSync(filePath);
-    if (convertedPath !== filePath) fs.unlinkSync(convertedPath);
+        responses.push(result.response.candidates);
 
-    // For local Testing
-    console.log(result);
+        // Clean up local files after uploading
+        fs.unlinkSync(filePath);
+        if (convertedPath !== filePath) fs.unlinkSync(convertedPath);
+      } catch (fileError) {
+        console.error(`Error processing file ${file.originalname}:`, fileError);
+        responses.push({ error: `Failed to process file: ${file.originalname}` });
+      }
+    }
 
-    // Send the response back to the client
-    res.json(result.response.candidates);
+    // Process the consolidated response
+    const consolidatedData = processResponses(responses);
+
+    // Local Testing Purposes
+    console.log(consolidatedData);
+
+    // Send consolidated data as the response
+    res.json(consolidatedData);
   } catch (error) {
-    console.error("Error processing file:", error);
-    res.status(500).json({ error: "Error processing file" });
+    console.error("Error processing files:", error);
+    res.status(500).json({ error: "Error processing files" });
   }
 });
 
