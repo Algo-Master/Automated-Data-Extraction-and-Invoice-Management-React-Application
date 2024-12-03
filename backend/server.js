@@ -10,11 +10,12 @@ require("dotenv").config();
 
 const app = express();
 const port = process.env.PORT;
+const Client_Url = process.env.CLIENT_URL;
 
 const cors = require("cors");
 
 const allowedOrigins = [
-  "https://your-frontend-domain.com",
+  `${Client_Url}`,
   "http://localhost:5173",
 ];
 
