@@ -12,3 +12,5 @@
     o>  Table React Component change: AG grid Table substituted for ShadCN table
         for editing features.
     o>  Synchronizing Redux with AG Grid
+
+9> Deployments ongoing Clientside -- 1
